@@ -45,10 +45,8 @@ export type Position = {
 export async function buildOption(
 	denops: Denops,
 	bang: boolean,
-	startLnum: number,
-	startCol: number,
-	endLnum: number,
-	endCol: number,
+	startPos: Position,
+	endPos: Position,
 	visualModeType: string,
 	arg: string,
 ): Promise<Option> {
@@ -84,8 +82,6 @@ export async function buildOption(
 	}
 
 	const message: string[] = [];
-	const startPos: Position = { lnum: startLnum, col: startCol };
-	const endPos: Position = { lnum: endLnum, col: endCol };
 
 	switch (parts.length) {
 		case 1:

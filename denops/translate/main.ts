@@ -30,10 +30,8 @@ export async function main(denops: Denops): Promise<void> {
   denops.dispatcher = {
     async translate(
       bang: unknown,
-      startLnum: unknown,
-      startCol: unknown,
-      endLnum: unknown,
-      endCol: unknown,
+      startPos: unknown,
+      endPos: unknown,
       visualModeType: unknown,
       arg: unknown,
     ): Promise<string[]> {
@@ -42,10 +40,8 @@ export async function main(denops: Denops): Promise<void> {
       const opt = await buildOption(
         denops,
         bang === "!",
-	ensureNumber(startLnum),
-	ensureNumber(startCol),
-	ensureNumber(endLnum),
-	ensureNumber(endCol),
+	ensureObject(startPos) as Position,
+	ensureObject(endPos) as Position,
 	ensureString(visualModeType),
         arg ? (arg as string) : "",
       );
