@@ -3,8 +3,14 @@
 " License: MIT
 
 function! translate#translate(bang, start, end, ...) abort
+	let start_pos = getcharpos("'<")
+	let start_lnum = start_pos[1]
+	let start_col = start_pos[2]
+	let end_pos = getcharpos("'>")
+	let end_lnum = end_pos[1]
+	let end_col = end_pos[2]
   try
-    let text = denops#request('translate', "translate", [a:bang, a:start, a:end] + a:000)
+    let text = denops#request('translate', "translate", [a:bang, start_lnum, start_col, end_lnum, end_col] + a:000)
     let ui = get(g:, 'translate_ui', 'popup')
     if ui ==# 'popup'
       call translate#window(text)

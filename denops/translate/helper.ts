@@ -1,13 +1,13 @@
-import { Denops, ensureString, vars, path, xdg } from "./deps.ts";
+import { Denops, ensureString, path, vars, xdg } from "./deps.ts";
 
 export const deeplAuthokeyPath = path.join(
   xdg.config(),
   "denops_translate",
-  "deepl_authkey"
+  "deepl_authkey",
 );
 
 export const onece = <A extends unknown, R extends Promise<unknown>>(
-  f: (arg?: A) => R
+  f: (arg?: A) => R,
 ) => {
   let v: R | undefined;
   return (arg?: A): R => {
@@ -21,7 +21,7 @@ export async function readDeepLAuthkey(): Promise<string> {
     return text.trim();
   } catch (e) {
     throw new Error(
-      `Cannot read DeepL's authkey from ${deeplAuthokeyPath}: ${e.message}`
+      `Cannot read DeepL's authkey from ${deeplAuthokeyPath}: ${e.message}`,
     );
   }
 }
@@ -37,12 +37,19 @@ export type Option = {
   text: string;
 };
 
+export type Position = {
+  lnum: number;
+  col: number;
+};
+
 export async function buildOption(
   denops: Denops,
   bang: boolean,
-  start: number,
-  end: number,
-  arg: string
+  startLnum: number,
+  startCol: number,
+  endLnum: number,
+  endCol: number,
+  arg: string,
 ): Promise<Option> {
   const parts: string[] = [];
 
@@ -76,6 +83,8 @@ export async function buildOption(
   }
 
   const message: string[] = [];
+  const startPos: Position = { lnum: startLnum, col: startCol };
+  const endPos: Position = { lnum: endLnum, col: endCol };
 
   switch (parts.length) {
     case 1:
@@ -84,8 +93,18 @@ export async function buildOption(
       break;
     case 2:
     case 0:
-      for (const m of (await denops.call("getline", start, end)) as string[]) {
-        message.push(m);
+      for (const [index, m] of ( (await denops.call("getline", startPos.lnum, endPos.lnum)) as string[] ).entries()) {
+	let editedMessage = m;
+	if (startPos.lnum === endPos.lnum) {
+		editedMessage = editedMessage.substring(startPos.col, endPos.col);
+	} else {
+		if (index === 0) {
+			editedMessage = editedMessage.substring(startPos.col);
+		} else if (startPos.lnum + index === endPos.lnum) {
+			editedMessage = editedMessage.substring(0, endPos.col);
+		}
+	}
+        message.push(editedMessage);
       }
       break;
     default: {

@@ -1,12 +1,13 @@
 import {
-  GTR,
   Denops,
   ensureNumber,
+  ensureObject,
   ensureString,
+  GTR,
   mapping,
   Mode,
 } from "./deps.ts";
-import { buildOption } from "./helper.ts";
+import { buildOption, Position } from "./helper.ts";
 import * as deepl from "./deepl.ts";
 
 export async function main(denops: Denops): Promise<void> {
@@ -29,18 +30,22 @@ export async function main(denops: Denops): Promise<void> {
   denops.dispatcher = {
     async translate(
       bang: unknown,
-      start: unknown,
-      end: unknown,
-      arg: unknown
+      startLnum: unknown,
+      startCol: unknown,
+      endLnum: unknown,
+      endCol: unknown,
+      arg: unknown,
     ): Promise<string[]> {
       ensureString(bang);
 
       const opt = await buildOption(
         denops,
         bang === "!",
-        ensureNumber(start),
-        ensureNumber(end),
-        arg ? (arg as string) : ""
+	ensureNumber(startLnum),
+	ensureNumber(startCol),
+	ensureNumber(endLnum),
+	ensureNumber(endCol),
+        arg ? (arg as string) : "",
       );
 
       if (opt.isDeepL) {
