@@ -34,6 +34,7 @@ export async function main(denops: Denops): Promise<void> {
       startCol: unknown,
       endLnum: unknown,
       endCol: unknown,
+      visualModeType: unknown,
       arg: unknown,
     ): Promise<string[]> {
       ensureString(bang);
@@ -45,6 +46,7 @@ export async function main(denops: Denops): Promise<void> {
 	ensureNumber(startCol),
 	ensureNumber(endLnum),
 	ensureNumber(endCol),
+	ensureString(visualModeType),
         arg ? (arg as string) : "",
       );
 

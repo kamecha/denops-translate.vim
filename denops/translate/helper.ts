@@ -49,6 +49,7 @@ export async function buildOption(
 	startCol: number,
 	endLnum: number,
 	endCol: number,
+	visualModeType: string,
 	arg: string,
 ): Promise<Option> {
 	const parts: string[] = [];
@@ -93,18 +94,33 @@ export async function buildOption(
 			break;
 		case 2:
 		case 0:
-			for (const [index, m] of ((await denops.call("getline", startPos.lnum, endPos.lnum)) as string[]).entries()) {
-				let editedMessage = m;
-				if (startPos.lnum === endPos.lnum) {
-					editedMessage = editedMessage.substring(startPos.col, endPos.col);
-				} else {
-					if (index === 0) {
-						editedMessage = editedMessage.substring(startPos.col);
-					} else if (startPos.lnum + index === endPos.lnum) {
-						editedMessage = editedMessage.substring(0, endPos.col);
+			switch (visualModeType) {
+				case "v":
+					for (const [index, m] of ((await denops.call("getline", startPos.lnum, endPos.lnum)) as string[]).entries()) {
+						let editedMessage = m;
+						if (startPos.lnum === endPos.lnum) {
+							editedMessage = editedMessage.substring(startPos.col, endPos.col);
+						} else {
+							if (index === 0) {
+								editedMessage = editedMessage.substring(startPos.col);
+							} else if (startPos.lnum + index === endPos.lnum) {
+								editedMessage = editedMessage.substring(0, endPos.col);
+							}
+						}
+						message.push(editedMessage);
 					}
-				}
-				message.push(editedMessage);
+					break;
+				case "V":
+					for (const m of ((await denops.call("getline", startPos.lnum, endPos.lnum)) as string[])) {
+						message.push(m);
+					}
+					break;
+				case "^V":
+					for (const m of ((await denops.call("getline", startPos.lnum, endPos.lnum)) as string[])) {
+						let editedMessage = m.substring(startPos.col, endPos.col);
+						message.push(editedMessage);
+					}
+					break;
 			}
 			break;
 		default: {
